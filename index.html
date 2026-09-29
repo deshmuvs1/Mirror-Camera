@@ -3,26 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Look at Yourself!</title>
+    <title>A Special Surprise!</title>
     <style>
-        body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; color: white; font-family: sans-serif; }
-        video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); } /* Mirrors the video so it feels natural */
+        body { 
+            margin: 0; 
+            background: #000; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            color: white; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            overflow: hidden;
+        }
+        
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        video { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            transform: scaleX(-1); /* Mirrors the front camera natively */
+        } 
+
+        /* "I Love You" Text - Pop-up animation */
+        .love-message {
+            position: absolute;
+            top: 20%;
+            background: rgba(255, 105, 180, 0.85); /* Romantic pink transparency */
+            color: white;
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 2px solid white;
+            
+            /* Animation triggers via JS */
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Active class to make text pop up */
+        .love-message.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Kiss Effect - Forms slowly over 3 seconds */
+        .kiss-overlay {
+            position: absolute;
+            font-size: 8rem; /* Large size for the kiss emoji */
+            filter: drop-shadow(0px 4px 10px rgba(0,0,0,0.4));
+            
+            /* Hidden initially */
+            opacity: 0;
+            transform: scale(0.1);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Animation class to smoothly grow the kiss */
+        .kiss-overlay.grow {
+            opacity: 1;
+            transform: scale(1.2);
+            transition: opacity 3s ease-in-out, transform 3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
     </style>
 </head>
 <body>
 
-    <video id="mirror" autoplay playsinline></video>
+    <div class="container">
+        <video id="mirror" autoplay playsinline></video>
+        
+        <!-- The Pop-up Message -->
+        <div class="love-message" id="loveMsg">I Love You! ❤️</div>
+        
+        <!-- The Kiss (Using Lips Emoji) -->
+        <div class="kiss-overlay" id="kissEmoji">💋</div>
+    </div>
 
     <script>
-        // Request access to the front camera only
+        const videoElement = document.getElementById('mirror');
+        const loveMsg = document.getElementById('loveMsg');
+        const kissEmoji = document.getElementById('kissEmoji');
+
+        // Request front camera access
         navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
             .then(function(stream) {
-                let video = document.getElementById('mirror');
-                video.srcObject = stream;
+                videoElement.srcObject = stream;
+
+                // Wait for the video stream to actually play before starting the effects
+                videoElement.onplaying = () => {
+                    // 1. Pop up the "I Love You" message immediately when camera plays
+                    setTimeout(() => {
+                        loveMsg.classList.add('show');
+                    }, 300);
+
+                    // 2. Start forming the kiss overlay, taking 3 full seconds to grow completely
+                    setTimeout(() => {
+                        kissEmoji.classList.add('grow');
+                    }, 500);
+                };
             })
             .catch(function(err) {
-                console.log("Camera access denied or not available: " + err);
-                document.body.innerHTML = "<h1>Please allow camera access to see your face!</h1>";
+                console.log("Error accessing camera: " + err);
+                document.body.innerHTML = "<h2 style='padding:20px; text-align:center; color: #ff69b4;'>Please allow camera permissions to view your surprise! 💕</h2>";
             });
     </script>
 </body>
