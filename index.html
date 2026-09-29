@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Look at Yourself!</title>
+    <style>
+        body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; color: white; font-family: sans-serif; }
+        video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); } /* Mirrors the video so it feels natural */
+    </style>
+</head>
+<body>
+
+    <video id="mirror" autoplay playsinline></video>
+
+    <script>
+        // Request access to the front camera only
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+            .then(function(stream) {
+                let video = document.getElementById('mirror');
+                video.srcObject = stream;
+            })
+            .catch(function(err) {
+                console.log("Camera access denied or not available: " + err);
+                document.body.innerHTML = "<h1>Please allow camera access to see your face!</h1>";
+            });
+    </script>
+</body>
+</html>
